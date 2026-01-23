@@ -1031,3 +1031,13 @@ body::before {
         font-size: 1rem;
     }
 }
+
+/* Custom image positioning adjustments */
+.detail-image[src*="InclineChestPress"],
+.detail-image[src*="ShoulderPress"],
+.detail-image[src*="LateralRaises"],
+.detail-image[src*="CableBicepCurl"],
+.detail-image[src*="HammerCurls"],
+.detail-image[src*="OverheadTricepExtensions"] {
+    object-position: center 70%;
+}
