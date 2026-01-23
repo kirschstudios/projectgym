@@ -1035,9 +1035,28 @@ body::before {
 /* Custom image positioning adjustments */
 .detail-image[src*="InclineChestPress"],
 .detail-image[src*="ShoulderPress"],
-.detail-image[src*="LateralRaises"],
 .detail-image[src*="CableBicepCurl"],
 .detail-image[src*="HammerCurls"],
 .detail-image[src*="OverheadTricepExtensions"] {
     object-position: center 70%;
+}
+
+/* Lateral Raises - position lower to show subject better */
+.detail-image[src*="LateralRaises"] {
+    object-position: center 80%;
+}
+
+/* Seated Cable Row - fix cut-off issue */
+.detail-image[src*="SeatedCableRow"] {
+    object-position: center center;
+    object-fit: contain;
+}
+
+/* Exercise card images positioning on main grid */
+.exercise-image img[src*="LateralRaises"] {
+    object-position: center 30% !important;
+}
+
+.exercise-image img[src*="SeatedCableRow"] {
+    object-position: center 40% !important;
 }
