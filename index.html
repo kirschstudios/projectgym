@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Gym</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- User Selection Page -->
+    <div class="page" id="userSelectionPage">
+        <div class="user-selection-container">
+            <div class="user-selection-header">
+                <h1 class="user-selection-title">💪 Welcome to Project Gym</h1>
+                <p class="user-selection-subtitle">Select your profile to continue</p>
+            </div>
+            
+            <div class="user-cards-grid" id="userCardsGrid">
+                <!-- User cards will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Page - Exercise List -->
+    <div class="page" id="mainPage" style="display: none;">
+        <div class="container">
+            <header class="header">
+                <div class="header-content">
+                    <div>
+                        <h1 class="title">💪 Project Gym</h1>
+                        <p class="subtitle">Track your progress, one rep at a time</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <button class="switch-user-btn" id="switchUserBtn">
+                            <span id="currentUserDisplay">User</span>
+                            <span style="margin-left: 0.5rem;">↻</span>
+                        </button>
+                        <button class="icon-btn" id="downloadDataBtn" title="Download Backup">💾</button>
+                        <button class="icon-btn" id="importDataBtn" title="Import Data">📥</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">🏋️</div>
+                    <div class="stat-value" id="totalWorkouts">0</div>
+                    <div class="stat-label">Total Workouts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-value" id="totalSets">0</div>
+                    <div class="stat-label">Total Sets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+            </div>
+
+            <div class="exercises-grid" id="exercisesGrid">
+                <!-- Exercise cards will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercise Detail Page -->
+    <div class="page" id="detailPage" style="display: none;">
+        <div class="detail-container">
+            <div class="detail-nav">
+                <button class="back-button" id="backButton">
+                    <span>←</span> Back to Exercises
+                </button>
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button class="switch-user-btn" id="switchUserBtnDetail">
+                        <span id="currentUserDisplayDetail">User</span>
+                        <span style="margin-left: 0.5rem;">↻</span>
+                    </button>
+                    <button class="icon-btn" id="downloadDataBtnDetail" title="Download Backup">💾</button>
+                    <button class="icon-btn" id="importDataBtnDetail" title="Import Data">📥</button>
+                </div>
+            </div>
+
+            <div class="detail-header">
+                <h1 class="detail-title" id="detailExerciseName">Exercise</h1>
+                <span class="detail-category" id="detailExerciseCategory">Category</span>
+            </div>
+
+            <div class="detail-content">
+                <!-- Left Side - Exercise Image -->
+                <div class="detail-left">
+                    <div class="detail-image-container">
+                        <img id="detailExerciseImage" src="" alt="Exercise" class="detail-image">
+                        <div class="detail-image-fallback" id="detailImageFallback">
+                            <span id="detailExerciseEmoji">💪</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side - Form and Stats -->
+                <div class="detail-right">
+                    <div class="detail-card">
+                        <h2 class="detail-card-title">Log Your Workout</h2>
+                        <div class="detail-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="detailWeightInput">Weight (kg)</label>
+                                    <input type="number" id="detailWeightInput" placeholder="0" step="0.5" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailRepsInput">Reps</label>
+                                    <input type="number" id="detailRepsInput" placeholder="0" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailSetsInput">Sets</label>
+                                    <input type="number" id="detailSetsInput" placeholder="1" min="1" value="1">
+                                </div>
+                            </div>
+                            <button class="btn-primary btn-large" id="detailSaveWorkout">
+                                💪 Save Workout
+                            </button>
+                        </div>
+
+                        <div class="detail-quick-stats">
+                            <div class="quick-stat">
+                                <div class="quick-stat-label">Last Weight</div>
+                                <div class="quick-stat-value" id="detailLastWeight">0 kg</div>
+                            </div>
+                            <div class="quick-stat">
+                                <div class="quick-stat-label">Last Reps</div>
+                                <div class="quick-stat-value" id="detailLastReps">0</div>
+                            </div>
+                            <div class="quick-stat">
+                                <div class="quick-stat-label">Total Sessions</div>
+                                <div class="quick-stat-value" id="detailTotalSessions">0</div>
+                            </div>
+                            <div class="quick-stat">
+                                <div class="quick-stat-label">Best Volume</div>
+                                <div class="quick-stat-value" id="detailBestVolume">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section - History and Chart -->
+            <div class="detail-bottom">
+                <div class="detail-card">
+                    <h2 class="detail-card-title">Progress Chart</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="detailProgressChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h2 class="detail-card-title">Workout History</h2>
+                    <div class="detail-history" id="detailHistoryList">
+                        <!-- History items will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
