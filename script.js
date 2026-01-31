@@ -1,3 +1,18 @@
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCiexsiclG-Si-cMr_ZY_U-LP0AHbZrj7o",
+    authDomain: "mulebuysummer.firebaseapp.com",
+    databaseURL: "https://mulebuysummer-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "mulebuysummer",
+    storageBucket: "mulebuysummer.firebasestorage.app",
+    messagingSenderId: "312446973462",
+    appId: "1:312446973462:web:0df57534859ffaa76e2737"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 // Exercise data with emojis for visual appeal and image paths
 const exercises = [
     { id: 1, name: 'Lat Pulldowns', emoji: '🦾', category: 'Back', image: 'images/exercises/LatPulldowns.png' },
@@ -78,14 +93,25 @@ function selectUser(username) {
     document.getElementById('currentUserDisplay').textContent = username;
     document.getElementById('currentUserDisplayDetail').textContent = username;
     
+    // Show loading overlay
+    showLoading();
+    
     // Hide user selection, show main page
     document.getElementById('userSelectionPage').style.display = 'none';
     document.getElementById('mainPage').style.display = 'block';
     
-    // Load user data
+    // Load user data (loadData now handles rendering internally)
     loadData();
-    renderExercises();
-    updateStats();
+}
+
+// Show loading overlay
+function showLoading() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+}
+
+// Hide loading overlay
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
 }
 
 // Switch to user selection screen
@@ -97,40 +123,61 @@ function switchUser() {
     currentExerciseId = null;
 }
 
-// Load data from localStorage for current user
+// Load data from Firebase for current user
 function loadData() {
     if (!currentUser) {
         console.error('No user selected');
         return;
     }
     
-    const storageKey = `gymProgressData_${currentUser}`;
-    const savedData = localStorage.getItem(storageKey);
+    const userRef = database.ref(`gym/users/${currentUser}`);
     
-    if (savedData) {
-        try {
-            workoutData = JSON.parse(savedData);
-            // Ensure all exercises exist in the data structure
-            exercises.forEach(exercise => {
-                if (!workoutData.exercises[exercise.id]) {
-                    workoutData.exercises[exercise.id] = {
-                        name: exercise.name,
-                        workouts: []
-                    };
-                }
-            });
-        } catch (error) {
-            console.error('Error loading data:', error);
+    userRef.once('value')
+        .then((snapshot) => {
+            const savedData = snapshot.val();
+            
+            if (savedData) {
+                workoutData = savedData;
+                // Ensure all exercises exist in the data structure
+                exercises.forEach(exercise => {
+                    if (!workoutData.exercises[exercise.id]) {
+                        workoutData.exercises[exercise.id] = {
+                            name: exercise.name,
+                            workouts: []
+                        };
+                    }
+                });
+            } else {
+                initializeData();
+            }
+            
+            // Render UI after data is loaded
+            renderExercises();
+            updateStats();
+            hideLoading();
+        })
+        .catch((error) => {
+            console.error('Error loading data from Firebase:', error);
+            alert('Failed to load data from Firebase. Please check your internet connection.');
             initializeData();
-        }
-    } else {
-        initializeData();
-    }
+            renderExercises();
+            updateStats();
+            hideLoading();
+        });
 }
 
 // Initialize data structure
 function initializeData() {
-    workoutData.exercises = {};
+    workoutData = {
+        exercises: {},
+        stats: {
+            totalWorkouts: 0,
+            totalSets: 0,
+            streak: 0,
+            lastWorkoutDate: null
+        }
+    };
+    
     exercises.forEach(exercise => {
         workoutData.exercises[exercise.id] = {
             name: exercise.name,
@@ -140,15 +187,23 @@ function initializeData() {
     saveData();
 }
 
-// Save data to localStorage for current user
+// Save data to Firebase for current user
 function saveData() {
     if (!currentUser) {
         console.error('No user selected');
         return;
     }
     
-    const storageKey = `gymProgressData_${currentUser}`;
-    localStorage.setItem(storageKey, JSON.stringify(workoutData));
+    const userRef = database.ref(`gym/users/${currentUser}`);
+    
+    userRef.set(workoutData)
+        .then(() => {
+            console.log('✅ Data saved to Firebase successfully');
+        })
+        .catch((error) => {
+            console.error('❌ Error saving data to Firebase:', error);
+            alert('Failed to save data. Please check your internet connection.');
+        });
 }
 
 // Render exercise cards
@@ -157,8 +212,17 @@ function renderExercises() {
     grid.innerHTML = '';
 
     exercises.forEach(exercise => {
+        // Safety check: ensure exerciseData exists
+        if (!workoutData.exercises[exercise.id] || !workoutData.exercises[exercise.id].workouts) {
+            workoutData.exercises[exercise.id] = {
+                name: exercise.name,
+                workouts: []
+            };
+        }
+        
+        // Now get the exerciseData after ensuring it exists
         const exerciseData = workoutData.exercises[exercise.id];
-        const lastWorkout = exerciseData?.workouts[exerciseData.workouts.length - 1];
+        const lastWorkout = exerciseData.workouts[exerciseData.workouts.length - 1];
         
         const card = document.createElement('div');
         card.className = 'exercise-card';
@@ -166,7 +230,7 @@ function renderExercises() {
 
         const lastWeight = lastWorkout ? lastWorkout.weight : 0;
         const lastReps = lastWorkout ? lastWorkout.reps : 0;
-        const totalSessions = exerciseData?.workouts.length || 0;
+        const totalSessions = exerciseData.workouts.length || 0;
 
         // Try to load image, fallback to emoji
         const imageHtml = `
@@ -255,13 +319,7 @@ function updateStats() {
     document.getElementById('totalSets').textContent = workoutData.stats.totalSets;
     document.getElementById('streak').textContent = workoutData.stats.streak;
 
-    // Add animation to stat values
-    document.querySelectorAll('.stat-value').forEach(el => {
-        el.style.animation = 'none';
-        setTimeout(() => {
-            el.style.animation = 'scaleIn 0.5s ease-out';
-        }, 10);
-    });
+    // Stats updated (animation removed for performance)
 }
 
 // Navigate to detail page
